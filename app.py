@@ -1,7 +1,6 @@
 from flask import Flask, request, jsonify
 from web3 import Web3
 import os
-import base64
 
 app = Flask(__name__)
 
@@ -13,14 +12,8 @@ def init_web3():
     if INFRA_API_KEY_ENV_VAL not in os.environ:
         print("ERROR: No Infura API key present in environment")
         return None
-    encoded_api_key = os.getenv(INFRA_API_KEY_ENV_VAL)
-    
-    try:
-        decoded_api_key = base64.b64decode(encoded_api_key).decode('utf-8')
-    except Exception as e:
-        print("ERROR: could not decode Infura API key: {e}")
-        return None
-    infra_url = BASE_INFURA_URL+decoded_api_key
+    api_key = os.getenv(INFRA_API_KEY_ENV_VAL)
+    infra_url = BASE_INFURA_URL+api_key
 
     return Web3(Web3.HTTPProvider(infra_url))
 
