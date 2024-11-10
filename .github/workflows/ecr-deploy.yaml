@@ -57,6 +57,13 @@ jobs:
       run: |
         aws eks update-kubeconfig --region ${{ vars.AWS_REGION }} --name ${{ vars.CLUSTER_NAME }}
 
+    - name: Check files before applying
+      run: |
+        pwd
+        ls -la
+        cat deployment.yaml
+        cat service.yaml
+    
     - name: Deploy service and deployment
       run: |
         echo "Applying deployment.yaml"
