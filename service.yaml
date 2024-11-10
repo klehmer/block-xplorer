@@ -3,6 +3,7 @@ kind: Service
 metadata:
   name: block-xplorer-service
   namespace: block-xplorer
+spec:
   selector:
     app: block-xplorer
   ports:
