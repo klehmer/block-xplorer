@@ -18,3 +18,10 @@ spec:
         image: 941377111777.dkr.ecr.us-east-2.amazonaws.com/block-xplorer:latest
         ports:
         - containerPort: 5001
+        resources:
+          requests:
+            cpu: "100m"    # 100 milliCPU
+            memory: "128Mi" # 128 MiB of memory
+          limits:
+            cpu: "500m"    # 500 milliCPU
+            memory: "512Mi" # 512 MiB of memory
