@@ -81,6 +81,7 @@ jobs:
         ECR_REPOSITORY_URI: ${{ vars.ECR_REPOSITORY_URI }}
       run: |
         kubectl set image deployment/block-xplorer-deployment block-xplorer=${{ vars.ECR_REPOSITORY_URI }}:latest -n $K8S_NAMESPACE
+        kubectl rollout restart deployment/block-xplorer-deployment
 
     
     
