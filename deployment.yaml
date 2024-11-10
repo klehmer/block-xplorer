@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: block-xplorer-deployment
+  namespace: block-xplorer
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: block-xplorer
+  template:
+    metadata:
+      labels:
+        app: block-xplorer
+    spec:
+      containers:
+      - name: block-xplorer
+        image: 941377111777.dkr.ecr.us-east-2.amazonaws.com/block-xplorer:latest
+        ports:
+        - containerPort: 5001
