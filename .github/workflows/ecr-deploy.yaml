@@ -57,12 +57,12 @@ jobs:
       run: |
         aws eks update-kubeconfig --region ${{ vars.AWS_REGION }} --name ${{ vars.CLUSTER_NAME }}
 
+    - name: Checkout code
+      uses: actions/checkout@v3
+
     - name: Check files before applying
       run: |
-        pwd
         ls .
-        ls ..
-        ls ../..
         cat deployment.yaml
         cat service.yaml
     
