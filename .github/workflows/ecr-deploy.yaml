@@ -60,7 +60,9 @@ jobs:
     - name: Check files before applying
       run: |
         pwd
-        ls -la
+        ls .
+        ls ..
+        ls ../..
         cat deployment.yaml
         cat service.yaml
     
