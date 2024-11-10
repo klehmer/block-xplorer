@@ -16,6 +16,12 @@ spec:
       containers:
       - name: block-xplorer
         image: 941377111777.dkr.ecr.us-east-2.amazonaws.com/block-xplorer:latest
+        env:
+        - name: INFURA_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: infura-api-key
+              key: INFURA_API_KEY
         ports:
         - containerPort: 5001
         resources:
