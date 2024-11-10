@@ -3,6 +3,8 @@ kind: Service
 metadata:
   name: block-xplorer-service
   namespace: block-xplorer
+  annotations:
+    service.beta.kubernetes.io/aws-load-balancer-additional-resource-tags: "Environment=prod,Project=block-xplorer,LBName=block-xplorer-service"
 spec:
   selector:
     app: block-xplorer
