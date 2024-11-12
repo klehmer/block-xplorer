@@ -1,0 +1,38 @@
+name: Build, Push, Deploy Python app
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'k8s/**'
+
+jobs:
+  deploy_manifests_to_eks:
+    name: Deploy to EKS
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ vars.AWS_REGION }}
+
+    - name: Update kubeconfig
+      run: |
+        aws eks update-kubeconfig --region ${{ vars.AWS_REGION }} --name ${{ vars.CLUSTER_NAME }}
+
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Print manifests and apply
+      run: |
+        for file in ./k8s/*; do
+          echo "Applying contents of $file:"
+          cat "$file"
+          echo
+          kubectl apply -f "$file"
+          echo
+        done
