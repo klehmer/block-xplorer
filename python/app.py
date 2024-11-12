@@ -45,7 +45,7 @@ def balance(address):
 
 # retrieve one or more balances using query parameter
 @app.route('/balances', methods=['GET'])
-def balance():
+def balances():
     # Get Ethereum addresses from the query parameters
     addresses = request.args.getlist('address')
     if not addresses:
