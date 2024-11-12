@@ -1,4 +1,4 @@
-name: Build, Push, Deploy Python app
+name: Deploy K8s manifests
 
 on:
   push:
