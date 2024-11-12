@@ -6,7 +6,6 @@ on:
       - main
     paths:
       - 'terraform/**'
-  workflow_dispatch:  # This allows manual triggering of the workflow
 
 env:
   TF_WORKSPACE: default
@@ -17,10 +16,12 @@ env:
   TF_VAR_github_token: ${{ secrets.GH_TOKEN }}
 
 jobs:
-  terraform:
-    name: Terraform Plan and Apply
+  terraform-plan:
+    name: Terraform Plan
     runs-on: ubuntu-latest
-
+    outputs:
+      changes_detected: ${{ steps.check_changes.outputs.apply }}
+    
     steps:
       # Step 1: Checkout code
       - name: Checkout code
@@ -63,23 +64,39 @@ jobs:
 
           if jq -e '.resource_changes | length == 0' tfplan.json; then
             echo "No changes detected."
-            echo "apply=false" >> $GITHUB_ENV
+            echo "::set-output name=changes_detected::false"
           else
             echo "Changes detected."
-            echo "apply=true" >> $GITHUB_ENV
+            echo "::set-output name=changes_detected::true"
           fi
 
-      # Step 7: Pause for manual approval (Prompt in the GitHub Actions UI)
-      - name: Wait for Approval
-        if: env.apply == 'true'
-        run: |
-          echo "### Please approve to apply Terraform changes."
-          echo "Run this step manually to approve Terraform apply."
-        shell: bash
+  terraform-apply:
+    name: Terraform Apply
+    runs-on: ubuntu-latest
+    needs: terraform-plan
+    environment:
+      name: terraform-approval
+      # Manual approval required for this environment (set in GitHub UI)
+    if: needs.terraform-plan.outputs.changes_detected == 'true'
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-      # Step 8: Apply Terraform if approved
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.5.7
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      # Apply Terraform changes
       - name: Apply Terraform
-        if: env.apply == 'true'
         run: |
           echo "Applying Terraform changes..."
           terraform -chdir=terraform apply "tfplan"
