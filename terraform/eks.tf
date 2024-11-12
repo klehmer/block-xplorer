@@ -53,3 +53,18 @@ resource "kubernetes_secret" "infura_api_key" {
 
   type = "python_environment_secret"
 }
+
+# test secret to test ci/cd
+resource "aws_secretsmanager_secret" "my_secret" {
+  name        = "my_secret_fdafjke"
+  description = "This is a simple AWS secret"
+}
+
+
+resource "aws_secretsmanager_secret_version" "my_secret_version" {
+  secret_id     = aws_secretsmanager_secret.my_secret.id
+  secret_string = jsonencode({
+    username = "my-username"
+    password = "my-passwordtest10"
+  })
+}
