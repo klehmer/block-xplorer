@@ -14,7 +14,6 @@ env:
   TF_VAR_aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
   TF_VAR_infura_api_key: ${{ secrets.INFURA_API_KEY }}
   TF_VAR_github_token: ${{ secrets.GH_TOKEN }}
-  CHANGES_DETECTED: false
 
 jobs:
   terraform-plan:
@@ -64,14 +63,10 @@ jobs:
 
           if echo "$PLAN_OUTPUT" | grep -q "No changes."; then
             echo "No changes detected."
-            echo "changes_detected='false'" >> $GITHUB_OUTPUT
-            echo "CHANGES_DETECTED=false" >>$GITHUB_ENV
-            echo $CHANGES_DETECTED
+            echo "apply='false'" >> $GITHUB_OUTPUT
           else
             echo "Changes detected."
-            echo "changes_detected='true'" >> $GITHUB_OUTPUT
-            echo "CHANGES_DETECTED=true" >>$GITHUB_ENV
-            echo $CHANGES_DETECTED
+            echo "apply='true'" >> $GITHUB_OUTPUT
           fi
 
   terraform-apply:
