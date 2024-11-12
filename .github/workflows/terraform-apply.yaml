@@ -69,18 +69,15 @@ jobs:
             echo "apply=true" >> $GITHUB_ENV
           fi
 
-      # Step 7: Trigger Manual Approval if changes exist
-      - name: Request Manual Approval if Changes Detected
+      # Step 7: Pause for manual approval (Prompt in the GitHub Actions UI)
+      - name: Wait for Approval
         if: env.apply == 'true'
-        uses: peter-evans/workflow-dispatch@v1
-        with:
-          repository: ${{ github.repository }}
-          workflow: terraform-apply-approval.yaml  # The separate workflow file for approval
-          ref: main
-          inputs:
-            apply_changes: "true"
+        run: |
+          echo "### Please approve to apply Terraform changes."
+          echo "Run this step manually to approve Terraform apply."
+        shell: bash
 
-      # Step 8: Terraform Apply (if approved)
+      # Step 8: Apply Terraform if approved
       - name: Apply Terraform
         if: env.apply == 'true'
         run: |
