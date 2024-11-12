@@ -63,7 +63,6 @@ jobs:
 
           if echo "$PLAN_OUTPUT" | grep -q "No changes."; then
             echo "No changes detected."
-            echo "apply=false" >> $GITHUB_OUTPUT
           else
             echo "Changes detected."
             echo "apply=true" >> $GITHUB_OUTPUT
