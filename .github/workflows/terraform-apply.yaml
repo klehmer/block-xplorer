@@ -55,7 +55,8 @@ jobs:
       - name: Check if plan has changes
         id: check_changes
         run: |
-          if terraform -chdir=terraform show -json tfplan | jq -e '.resource_changes | length == 0'; then
+          terraform -chdir=terraform show -json tfplan > tfplan.json || exit 1
+          if jq -e '.resource_changes | length == 0' tfplan.json; then
             echo "No changes detected."
             echo "apply=false" >> $GITHUB_ENV
           else
