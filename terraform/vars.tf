@@ -54,4 +54,8 @@ variable "k8s_namespace" {
   default = "block-xplorer"
 }
 
-variable "github_token" {}
+variable "github_token" {
+  description = "Github token"
+  type = string
+  sensitive = true
+}
