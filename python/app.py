@@ -32,25 +32,39 @@ def get_eth_balance(address):
 
     return balance_eth
 
-# Define the endpoint
-@app.route('/balance', methods=['GET'])
-def balance():
-    # Get the Ethereum address from the query parameters
-    address = request.args.get('address')
-    if not address:
-        return jsonify({"error": "Ethereum address is required"}), 400
-
+# retrieve a single balance using path parameter
+@app.route('/balance/<address>', methods=['GET'])
+def balance(address):
     # Fetch balance
     balance = get_eth_balance(address)
     if balance is None:
         return jsonify({"error": "Invalid Ethereum address"}), 400
 
     # Return the balance as a JSON response
-    return jsonify({"address": address, "balance": str(balance)})
+    return jsonify({"balance": str(balance)})
+
+# retrieve one or more balances using query parameter
+@app.route('/balances', methods=['GET'])
+def balance():
+    # Get Ethereum addresses from the query parameters
+    addresses = request.args.getlist('address')
+    if not addresses:
+        return jsonify({"error": "At least one Ethereum address is required"}), 400
+
+    balances = {}
+    for address in addresses:
+        balance, error = get_eth_balance(address)
+        if error:
+            balances[address] = {"error": error}
+        else:
+            balances[address] = str(balance)
+
+    # Return the balances as a JSON response
+    return jsonify(balances)
 
 @app.route('/')
 def hello_world():
-    return "Hello, beautiful world!"
+    return "Hello, world!"
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5001)
