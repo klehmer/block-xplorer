@@ -63,9 +63,11 @@ jobs:
           if echo "$PLAN_OUTPUT" | grep -q "No changes."; then
             echo "No changes detected."
             echo "changes_detected=false" >> $GITHUB_OUTPUT
+            echo $GITHUB_OUTPUT
           else
             echo "Changes detected."
             echo "changes_detected=true" >> $GITHUB_OUTPUT
+            echo $GITHUB_OUTPUT
           fi
 
   terraform-apply:
