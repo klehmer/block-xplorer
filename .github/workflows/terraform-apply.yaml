@@ -15,8 +15,8 @@ env:
   TF_VAR_github_token: ${{ secrets.GH_TOKEN }}
 
 jobs:
-  terraform_plan:
-    name: Terraform Plan
+  terraform:
+    name: Terraform Plan and Apply
     runs-on: ubuntu-latest
 
     steps:
@@ -51,11 +51,14 @@ jobs:
         id: plan
         run: terraform -chdir=terraform plan -out=tfplan
 
-      # Step 6: Check for changes
+      # Step 6: Check if plan has changes
       - name: Check if plan has changes
         id: check_changes
         run: |
           terraform -chdir=terraform show -json tfplan > tfplan.json || exit 1
+          echo "Terraform Plan JSON output:"
+          cat tfplan.json
+
           if jq -e '.resource_changes | length == 0' tfplan.json; then
             echo "No changes detected."
             echo "apply=false" >> $GITHUB_ENV
@@ -64,37 +67,16 @@ jobs:
             echo "apply=true" >> $GITHUB_ENV
           fi
 
-  terraform_apply:
-    name: Terraform Apply
-    runs-on: ubuntu-latest
-    needs: terraform_plan
-    if: needs.terraform_plan.outputs.apply == 'true'
+      # Step 7: Terraform Apply (requires approval)
+      - name: Terraform Apply (requires approval)
+        if: env.apply == 'true'
+        run: |
+          echo "Changes detected, requesting approval before applying."
+          terraform -chdir=terraform apply -auto-approve tfplan
 
-    steps:
-      # Step 1: Checkout code again for the apply job
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      # Step 2: Set up Terraform
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v2
-        with:
-          terraform_version: 1.5.7 # Adjust to your required Terraform version
-
-      # Step 3: Configure AWS credentials again for the apply job
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ vars.AWS_REGION }}
-
-      # Step 4: Request approval before applying
-      - name: Terraform Apply Approval
-        uses: hmarr/auto-approve-action@v2
-        with:
-          message: "Terraform apply requires approval."
-
-      # Step 5: Apply Terraform changes
+      # Step 8: Final Apply if approval was granted
       - name: Apply Terraform
-        run: terraform -chdir=terraform apply "tfplan"
+        if: env.apply == 'true'
+        run: |
+          echo "Applying Terraform changes..."
+          terraform -chdir=terraform apply "tfplan"
