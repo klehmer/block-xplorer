@@ -78,11 +78,6 @@ jobs:
       # Manual approval required for this environment (set in GitHub UI)
     
     steps:
-      - name: check output
-        run: |
-          echo $CHANGES_DETECTED
-          echo "Changes detected: ${{ needs.terraform-plan.outputs.changes_detected }}"
-
       - name: Checkout code
         uses: actions/checkout@v3
 
