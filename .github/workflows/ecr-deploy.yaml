@@ -63,16 +63,16 @@ jobs:
 
     - name: Check files before applying
       run: |
-        ls .
-        cat deployment.yaml
-        cat service.yaml
+        ls ./k8s
+        cat k8s/deployment.yaml
+        cat k8s/service.yaml
     
     - name: Deploy service and deployment
       run: |
         echo "Applying deployment.yaml"
-        kubectl apply -f deployment.yaml
+        kubectl apply -f k8s/deployment.yaml
         echo "Applying service.yaml"
-        kubectl apply -f service.yaml
+        kubectl apply -f k8s/service.yaml
 
     - name: Deploy new image to EKS
       env:
@@ -82,35 +82,3 @@ jobs:
       run: |
         kubectl set image deployment/block-xplorer-deployment block-xplorer=${{ vars.ECR_REPOSITORY_URI }}:latest -n $K8S_NAMESPACE
         kubectl rollout restart deployment/block-xplorer-deployment -n $K8S_NAMESPACE
-
-    
-    
-    # - name: Check for changes in deployment.yaml
-    #   id: check_deployment
-    #   run: |
-    #     if git diff --name-only HEAD^ HEAD | grep -E '^deployment.yaml$'; then
-    #       echo "deployment_changed=true" >> $GITHUB_ENV
-    #     else
-    #       echo "deployment_changed=false" >> $GITHUB_ENV
-    #     fi
-
-    # - name: Check for changes in service.yaml
-    #   id: check_service
-    #   run: |
-    #     if git diff --name-only HEAD^ HEAD | grep -E '^service.yaml$'; then
-    #       echo "service_changed=true" >> $GITHUB_ENV
-    #     else
-    #       echo "service_changed=false" >> $GITHUB_ENV
-    #     fi
-
-    # - name: Apply deployment if changed
-    #   if: env.deployment_changed == 'true'
-    #   run: |
-    #     echo "Applying deployment.yaml"
-    #     kubectl apply -f deployment.yaml
-
-    # - name: Apply service if changed
-    #   if: env.service_changed == 'true'
-    #   run: |
-    #     echo "Applying service.yaml"
-    #     kubectl apply -f service.yaml
