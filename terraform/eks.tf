@@ -60,6 +60,7 @@ resource "aws_secretsmanager_secret" "my_secret" {
   description = "This is a simple AWS secret"
 }
 
+
 resource "aws_secretsmanager_secret_version" "my_secret_version" {
   secret_id     = aws_secretsmanager_secret.my_secret.id
   secret_string = jsonencode({
