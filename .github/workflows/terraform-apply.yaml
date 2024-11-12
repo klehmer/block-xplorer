@@ -80,7 +80,7 @@ jobs:
     steps:
       - name: check output
         run: |
-          echo "Changes detected: ${{needs.terraform-plan.outputs.changes_detected}}"
+          echo "Changes detected: ${{ needs.terraform-plan.outputs.changes_detected }}""
 
       - name: Checkout code
         uses: actions/checkout@v3
