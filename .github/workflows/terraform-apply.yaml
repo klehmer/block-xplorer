@@ -52,28 +52,26 @@ jobs:
         id: plan
         run: terraform -chdir=terraform plan -out=tfplan
 
-      # # Step 6: Check for changes
-      # - name: Check if plan has changes
-      #   id: check_changes
-      #   run: |
-      #     if terraform -chdir=terraform show -json tfplan | jq -e '.resource_changes | length == 0'; then
-      #       echo "No changes detected."
-      #       echo "apply=false" >> $GITHUB_ENV
-      #     else
-      #       echo "Changes detected."
-      #       echo "apply=true" >> $GITHUB_ENV
-      #     fi
+      # Step 6: Check for changes
+      - name: Check if plan has changes
+        id: check_changes
+        run: |
+          if terraform -chdir=terraform show -json tfplan | jq -e '.resource_changes | length == 0'; then
+            echo "No changes detected."
+            echo "apply=false" >> $GITHUB_ENV
+          else
+            echo "Changes detected."
+            echo "apply=true" >> $GITHUB_ENV
+          fi
 
-      # # Step 7: Request approval and apply if changes are detected
-      # - name: Terraform Apply (requires approval)
-      #   if: env.apply == 'true'
-      #   needs: check_changes
-      #   uses: hmarr/auto-approve-action@v2
-      #   with:
-      #     message: "Terraform apply requires approval."
+      # Step 7: Request approval and apply if changes are detected
+      - name: Terraform Apply (requires approval)
+        if: env.apply == 'true'
+        needs: check_changes
+        uses: hmarr/auto-approve-action@v2
+        with:
+          message: "Terraform apply requires approval."
 
-      # - name: Apply Terraform
-      #   if: env.apply == 'true'
-      #   run: terraform -chdir=terraform apply "tfplan"
-      #   env:
-      #     TF_VAR_example: ${{ secrets.TF_VAR_EXAMPLE }}
+      - name: Apply Terraform
+        if: env.apply == 'true'
+        run: terraform -chdir=terraform apply "tfplan"
