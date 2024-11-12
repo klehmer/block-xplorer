@@ -21,24 +21,25 @@ web3 = init_web3()
 
 # Function to get balance of an Ethereum address
 def get_eth_balance(address):
-
     # Check if the address is valid
     if not web3.is_address(address):
-        return jsonify({"error": "Invalid web3 address"}), 400
+        return None, "Error - invalid address"
 
     # Get the balance in Wei and convert it to Ether
-    balance_wei = web3.eth.get_balance(address)
-    balance_eth = web3.from_wei(balance_wei, 'ether')
-
-    return balance_eth
+    try:
+        balance_wei = web3.eth.get_balance(address)
+        balance_eth = web3.from_wei(balance_wei, 'ether')
+        return balance_eth, None
+    except Exception as e:
+        return None, f"Error - {str(e)}"
 
 # retrieve a single balance using path parameter
 @app.route('/balance/<address>', methods=['GET'])
 def balance(address):
     # Fetch balance
-    balance = get_eth_balance(address)
-    if balance is None:
-        return jsonify({"error": "Invalid Ethereum address"}), 400
+    balance, error = get_eth_balance(address)
+    if error:
+        return jsonify({"balance": error}), 400
 
     # Return the balance as a JSON response
     return jsonify({"balance": str(balance)})
@@ -53,9 +54,9 @@ def balances():
 
     balances = {}
     for address in addresses:
-        balance = get_eth_balance(address)
-        if balance is None:
-            balances[address] = "Error - Invalid Ethereum address"
+        balance, error = get_eth_balance(address)
+        if error:
+            balances[address] = error
         else:
             balances[address] = str(balance)
 
