@@ -63,6 +63,7 @@ jobs:
 
           if echo "$PLAN_OUTPUT" | grep -q "No changes."; then
             echo "No changes detected."
+            echo "apply=false" >> $GITHUB_OUTPUT
           else
             echo "Changes detected."
             echo "apply=true" >> $GITHUB_OUTPUT
@@ -72,7 +73,7 @@ jobs:
     name: Terraform Apply
     runs-on: ubuntu-latest
     needs: terraform-plan
-    if: ${{ needs.terraform-plan.outputs.changes_detected }}
+    if: ${{ needs.terraform-plan.outputs.changes_detected == true }}
     environment:
       name: terraform-approval
       # Manual approval required for this environment (set in GitHub UI)
