@@ -6,6 +6,8 @@ on:
       - main
     paths:
       - 'terraform/**'
+  workflow_dispatch:  # This allows manual triggering of the workflow
+
 env:
   TF_WORKSPACE: default
   AWS_REGION: ${{ secrets.AWS_REGION }}
@@ -28,7 +30,7 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v2
         with:
-          terraform_version: 1.5.7 # Adjust to your required Terraform version
+          terraform_version: 1.5.7
 
       # Step 3: Configure AWS credentials
       - name: Configure AWS credentials
@@ -36,15 +38,15 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ vars.AWS_REGION }}
+          aws-region: ${{ secrets.AWS_REGION }}
 
       # Step 4: Initialize Terraform with S3 Backend
       - name: Terraform Init
         run: |
           terraform -chdir=terraform init \
-            -backend-config="bucket=${{ vars.TF_STATE_BUCKET }}" \
+            -backend-config="bucket=${{ secrets.TF_STATE_BUCKET }}" \
             -backend-config="key=state" \
-            -backend-config="region=${{ vars.AWS_REGION }}"
+            -backend-config="region=${{ secrets.AWS_REGION }}"
 
       # Step 5: Terraform Plan
       - name: Terraform Plan
@@ -67,14 +69,18 @@ jobs:
             echo "apply=true" >> $GITHUB_ENV
           fi
 
-      # Step 7: Terraform Apply (requires approval)
-      - name: Terraform Apply (requires approval)
+      # Step 7: Trigger Manual Approval if changes exist
+      - name: Request Manual Approval if Changes Detected
         if: env.apply == 'true'
-        run: |
-          echo "Changes detected, requesting approval before applying."
-          terraform -chdir=terraform apply -auto-approve tfplan
+        uses: peter-evans/workflow-dispatch@v1
+        with:
+          repository: ${{ github.repository }}
+          workflow: terraform-apply-approval.yml  # The separate workflow file for approval
+          ref: main
+          inputs:
+            apply_changes: "true"
 
-      # Step 8: Final Apply if approval was granted
+      # Step 8: Terraform Apply (if approved)
       - name: Apply Terraform
         if: env.apply == 'true'
         run: |
