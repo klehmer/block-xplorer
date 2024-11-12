@@ -58,11 +58,10 @@ jobs:
       - name: Check if plan has changes
         id: check_changes
         run: |
-          terraform -chdir=terraform show -json tfplan > tfplan.json || exit 1
-          echo "Terraform Plan JSON output:"
-          cat tfplan.json
+          PLAN_OUTPUT=$(terraform -chdir=terraform plan -no-color)
+          echo "$PLAN_OUTPUT"
 
-          if jq -e '.resource_changes | length == 0' tfplan.json; then
+          if echo "$PLAN_OUTPUT" | grep -q "No changes."; then
             echo "No changes detected."
             echo "{changes_detected}={false}" >> $GITHUB_OUTPUT
           else
@@ -74,7 +73,7 @@ jobs:
     name: Terraform Apply
     runs-on: ubuntu-latest
     needs: terraform-plan
-    if: needs.terraform-plan.outputs.changes_detected == 'true'
+    if: true
     environment:
       name: terraform-approval
       # Manual approval required for this environment (set in GitHub UI)
