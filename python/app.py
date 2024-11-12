@@ -55,7 +55,7 @@ def balances():
     for address in addresses:
         balance = get_eth_balance(address)
         if balance is None:
-            balances[address] = {"Error - Invalid Ethereum address"}
+            balances[address] = "Error - Invalid Ethereum address"
         else:
             balances[address] = str(balance)
 
