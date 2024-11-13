@@ -81,12 +81,6 @@ class TestEthereumAPI(unittest.TestCase):
 
         self.assertEqual(response.status_code, 400)
         self.assertEqual(data['error'], "At least one Ethereum address is required")
-
-    def test_hello_world_route(self):
-        # Test the root endpoint for a simple response
-        response = self.app.get('/')
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data.decode(), "Hello, world!")
     
     @patch('app.web3')
     def test_healthz_healthy(self, mock_web3):
@@ -103,7 +97,7 @@ class TestEthereumAPI(unittest.TestCase):
     @patch('app.web3')
     def test_healthz_unhealthy(self, mock_web3):
         # Mock web3 to simulate an unhealthy connection
-        mock_web3.isConnected.return_value = False
+        mock_web3.is_connected.return_value = False
 
         # Call the healthz endpoint
         response = self.app.get('/healthz')

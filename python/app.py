@@ -66,14 +66,10 @@ def balances():
 @app.route('/healthz', methods=['GET'])
 def health_check():
     # Check if web3 is initialized and connected
-    if web3 is not None and web3.isConnected():
+    if web3 is not None and web3.is_connected():
         return jsonify({"status": "healthy"}), 200
     else:
         return jsonify({"status": "unhealthy", "error": "Unable to connect to Ethereum network"}), 500
-
-@app.route('/')
-def hello_world():
-    return "Hello, world!"
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5001)
