@@ -31,6 +31,8 @@ jobs:
 
       # Step 4: Run unit tests
       - name: Run tests
+        env:
+          INFURA_API_KEY: ${{ secrets.INFURA_API_KEY }}
         run: |
           export PYTHONPATH=$PYTHONPATH:$(pwd)/python
           python -m unittest python/test_app.py
