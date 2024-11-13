@@ -47,17 +47,17 @@ resource "github_actions_variable" "k8s_namespace" {
 resource "github_actions_variable" "terraform_state_bucket" {
   repository    = local.block_xplorer_repo
   variable_name = "TF_STATE_BUCKET"
-  value = "block-xplorer-tf-state"
+  value         = "block-xplorer-tf-state"
 }
 
 resource "github_actions_secret" "infura_api_key" {
-  repository    = local.block_xplorer_repo
-  secret_name = "INFURA_API_KEY"
+  repository      = local.block_xplorer_repo
+  secret_name     = "INFURA_API_KEY"
   plaintext_value = var.infura_api_key
 }
 
 resource "github_actions_secret" "github_token" {
-  repository    = local.block_xplorer_repo
-  secret_name = "GH_TOKEN"
+  repository      = local.block_xplorer_repo
+  secret_name     = "GH_TOKEN"
   plaintext_value = var.github_token
 }

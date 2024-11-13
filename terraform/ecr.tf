@@ -12,12 +12,12 @@ resource "aws_ecr_lifecycle_policy" "block_xplorer_policy" {
       {
         rulePriority = 1
         description  = "Retain only the 30 most recent images"
-        selection    = {
-          tagStatus     = "any"
-          countType     = "imageCountMoreThan"
-          countNumber   = 30
+        selection = {
+          tagStatus   = "any"
+          countType   = "imageCountMoreThan"
+          countNumber = 30
         }
-        action       = {
+        action = {
           type = "expire"
         }
       }

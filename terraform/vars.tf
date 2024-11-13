@@ -47,15 +47,19 @@ variable "domain_name" {
 }
 
 variable "region" {
-  default = "us-east-2"
+  description = "AWS region where application is deployed"
+  type        = string
+  default     = "us-east-2"
 }
 
 variable "k8s_namespace" {
-  default = "block-xplorer"
+  description = "Kubernetes namespace where application is deployed"
+  type        = string
+  default     = "block-xplorer"
 }
 
 variable "github_token" {
   description = "Github token"
-  type = string
-  sensitive = true
+  type        = string
+  sensitive   = true
 }
