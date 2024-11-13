@@ -87,6 +87,30 @@ class TestEthereumAPI(unittest.TestCase):
         response = self.app.get('/')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data.decode(), "Hello, world!")
+    
+    @patch('app.web3')
+    def test_healthz_healthy(self, mock_web3):
+        # Mock web3 to simulate a healthy connection
+        mock_web3.isConnected.return_value = True
+
+        # Call the healthz endpoint
+        response = self.app.get('/healthz')
+
+        # Verify response
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json, {"status": "healthy"})
+
+    @patch('app.web3')
+    def test_healthz_unhealthy(self, mock_web3):
+        # Mock web3 to simulate an unhealthy connection
+        mock_web3.isConnected.return_value = False
+
+        # Call the healthz endpoint
+        response = self.app.get('/healthz')
+
+        # Verify response
+        self.assertEqual(response.status_code, 500)
+        self.assertEqual(response.json, {"status": "unhealthy", "error": "Unable to connect to Ethereum network"})
 
 if __name__ == '__main__':
     unittest.main()
