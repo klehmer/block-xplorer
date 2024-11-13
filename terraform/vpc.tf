@@ -29,3 +29,25 @@ module "vpc" {
     "kubernetes.io/role/internal-elb" = 1
   }
 }
+
+# Create a route table
+resource "aws_route_table" "egress_route_table" {
+  vpc_id = module.vpc.vpc_id
+
+  # Route all outbound traffic (0.0.0.0/0) through the NAT gateway
+  route {
+    cidr_block     = "0.0.0.0/0"
+    nat_gateway_id = module.vpc.natgw_ids.0
+  }
+
+  tags = {
+    Name = "egress-route-table"
+  }
+}
+
+# Associate the route table with each private subnet
+resource "aws_route_table_association" "rt_subnet_associations" {
+  for_each       = toset(module.vpc.private_subnets)
+  subnet_id      = each.value
+  route_table_id = aws_route_table.egress_route_table.id
+}
