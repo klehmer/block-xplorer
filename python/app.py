@@ -33,6 +33,15 @@ def get_eth_balance(address):
     except Exception as e:
         return None, f"Error - {str(e)}"
 
+
+# retrieve a single balance using path parameter
+@app.route('/transaction/<tx_hash>', methods=['GET'])
+def transaction(tx_hash):
+    # Fetch transaction
+    transaction = web3.eth.get_transaction(tx_hash)
+    return jsonify({"transaction": str(transaction)})
+
+
 # retrieve a single balance using path parameter
 @app.route('/balance/<address>', methods=['GET'])
 def balance(address):
@@ -73,3 +82,4 @@ def health_check():
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5001)
+    # app.run(host='127.0.0.1', port=5001, debug=True)
